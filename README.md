@@ -34,11 +34,11 @@ You need to configure the application first in order to use it correctly. Config
  
 # Configure OpenTX
 In order to get your OpenTX trasmitter to actually log your flight, you need to tell it to do so. 
-On page **SPECIAL FUNCTIONS** on your transmitter you would need to setup a sd log. My craft arms with switch SC so I created a **trigger** on switch **SC** that starts logging to sd **SD Log**.
+On page **SPECIAL FUNCTIONS** on your transmitter you would need to setup a sd log. My craft arms with switch SC so I created a **trigger** on switch **SC** that starts logging to **SD Log**.
 
 ![Special Functions Sample](https://github.com/naice/OpenTXLog2GoogleEarth/blob/master/Media/special-functions-log.jpg)
 
-First entry is the triggen for me the **SC** switch second entry is the action **SD Log** and the thrid entry is the delay of logging **0.2s**.
+First entry is the trigger **SC** switch second entry is the action **SD Log** and the thrid entry is the delay of logging **0.2s**.
 
 # Nerds
 The first input parameter is the CSV File to convert. I haven't had time to make a 2nd parameter for the output file, but you are welcome to make a pull request. 
