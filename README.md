@@ -1,6 +1,8 @@
 # OpenTXLog2GoogleEarth
 Converts OpenTX log files (with gps data) to GoogleEarth (kml file)
 
+![Preview](https://github.com/naice/OpenTXLog2GoogleEarth/blob/master/Media/Google%20Earth%20Pro.png)
+
 # Usage
 Install Google Earth Pro from here: https://www.google.de/earth/download/gep/agree.html
 
