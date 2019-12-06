@@ -15,6 +15,9 @@ namespace OpenTXLog2GoogleEarthConvert
 <kml xmlns=""http://www.opengis.net/kml/2.2"" xmlns:gx=""http://www.google.com/kml/ext/2.2"">
 	<Document>
 		<name>{FULLNAME}</name>
+        <visibility>1</visibility>
+        <open>1</open>
+        <Snippet><![CDATA[Created using <a href=""https://github.com/naice/OpenTXLog2GoogleEarth"">OpenTXLog2GoogleEarth</a>]]></Snippet>
 		<Style id=""multiTrack"">
 			<IconStyle>
 				<Icon>
