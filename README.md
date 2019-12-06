@@ -10,3 +10,6 @@ You need to configure the application first in order to use it correctly. Config
  If your configuration is done, run the application once as administrator, it will automatically bind the *.csv extension to it so you just can rightclick (or doubleclick) and select "Open in Google Earth". 
  
  The application stores the converted files in its application path.
+
+# Nerds
+The first input parameter is the CSV File to convert. I haven't had time to make a 2nd parameter for the output file, but you are welcome to make a pull request. 
