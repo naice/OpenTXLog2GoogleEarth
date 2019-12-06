@@ -1,0 +1,11 @@
+{
+  "PathColor": "991081f4",
+  "AltitudeMode": "relativeToGround",
+  "AltitudeOffset": 0.0,
+  "GoogleEarthExe": "C:\\Program Files\\Google\\Google Earth Pro\\client\\googleearth.exe",
+  "GPSHeader": "GPS",
+  "GPSSpeedHeader": "GSpd(kmh)",
+  "AltitudeHeader": "Alt(m)",
+  "TimeHeader": "Time",
+  "DateHeader": "Date"
+}
