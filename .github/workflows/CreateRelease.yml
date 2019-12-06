@@ -1,0 +1,11 @@
+- name: Create a Release
+  uses: actions/create-release@v1
+  with:
+    # The name of the tag. This should come from the webhook payload, `github.GITHUB_REF` when a user pushes a new tag
+    tag_name: "v*"
+    # The name of the release. For example, `Release v1.0.1`
+    release_name: "Pre-Release v0.0.2"
+    # `true` to create a draft (unpublished) release, `false` to create a published one. Default: `false`
+    draft: false
+    # `true` to identify the release as a prerelease. `false` to identify the release as a full release. Default: `false`
+    prerelease: true
