@@ -37,3 +37,6 @@ The first input parameter is the CSV File to convert. I haven't had time to make
  * Move to XML-Serialization 
  * Extend command line
  * Error handling
+ 
+# Discord
+For questions, bugs and help: https://discord.gg/Qb99yZ
