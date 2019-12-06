@@ -1,4 +1,5 @@
 # OpenTXLog2GoogleEarth
+[![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=KXGFDMWVS8E66)
 Converts OpenTX log files (with gps data) to GoogleEarth (kml file)
 
 ![Preview](https://github.com/naice/OpenTXLog2GoogleEarth/blob/master/Media/Google%20Earth%20Pro.png)
