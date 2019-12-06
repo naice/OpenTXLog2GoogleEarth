@@ -19,6 +19,9 @@ jobs:
           dotnet-version: 3.0.100
       - name: Build with dotnet
         run: dotnet build --configuration Release
+      - name: Zip Release Folder
+        id: zip_release_folder
+        run: zip ./release${{ github.ref }}.zip ./OpenTXLog2GoogleEarth/bin/Release/netcoreapp3.0
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
@@ -34,12 +37,12 @@ jobs:
           draft: true
           prerelease: true
       - name: Upload Release Asset
-        id: upload-release-asset 
+        id: upload_release_asset 
         uses: actions/upload-release-asset@v1.0.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-          asset_path: ./my-artifact.zip
-          asset_name: my-artifact.zip
+          asset_path: ./release${{ github.ref }}.zip
+          asset_name: release${{ github.ref }}.zip
           asset_content_type: application/zip
