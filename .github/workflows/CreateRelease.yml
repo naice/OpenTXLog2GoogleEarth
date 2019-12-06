@@ -21,7 +21,7 @@ jobs:
         run: dotnet build --configuration Release
       - name: Zip Release Folder
         id: zip_release_folder
-        run: zip ./release.zip ./OpenTXLog2GoogleEarth/bin/Release/netcoreapp3.0
+        run: zip -r ./release.zip ./OpenTXLog2GoogleEarth/bin/Release/netcoreapp3.0/
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
