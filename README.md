@@ -2,6 +2,8 @@
 Converts OpenTX log files (with gps data) to GoogleEarth (kml file)
 
 # Usage
+Install Google Earth Pro from here: https://www.google.de/earth/download/gep/agree.html
+
 You need to configure the application first in order to use it correctly. Configuration is done via config.json
  * AltitudeMode sets the mode of altitude for your GPS Path, absolut / relativeToGround
  * AltitudeOffset will add the given amount to the alititude readings of your log
