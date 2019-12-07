@@ -5,6 +5,8 @@
   "GoogleEarthExe": "C:\\Program Files\\Google\\Google Earth Pro\\client\\googleearth.exe",
   "GPSHeader": "GPS",
   "GPSSpeedHeader": "GSpd(kmh)",
+  "GPSSpeedFactor": 1,
+  "GPSSpeedLabel": "km/h",
   "AltitudeHeader": "Alt(m)",
   "TimeHeader": "Time",
   "DateHeader": "Date"

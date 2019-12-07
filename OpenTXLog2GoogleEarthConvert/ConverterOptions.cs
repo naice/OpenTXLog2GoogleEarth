@@ -57,5 +57,16 @@ namespace OpenTXLog2GoogleEarthConvert
         /// The color of the path in google earth.
         /// </summary>
         public string PathColor { get; set; } = "991081f4";
+        /// <summary>
+        /// The value from gps speed header will be multiplied by this factor. 
+        /// KMH = 1
+        /// NODE (KNOTEN) = 1.852
+        /// MPH = 1.609344
+        /// </summary>
+        public decimal GPSSpeedFactor { get; set; } = 1m;
+        /// <summary>
+        /// Label for speed output.
+        /// </summary>
+        public string GPSSpeedLabel { get; set; } = "kmh";
     }
 }
