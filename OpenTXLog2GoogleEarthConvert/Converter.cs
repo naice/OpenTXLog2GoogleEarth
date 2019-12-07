@@ -65,7 +65,7 @@ namespace OpenTXLog2GoogleEarthConvert
 
             var currentCulture = CultureInfo.CurrentCulture;
             CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
-            var speeds = _options.LogLines.Skip(1).Select(line => decimal.Parse(line.Split(',')[_gpsSpeedIndex])).ToArray();
+            var speeds = _options.LogLines.Skip(1).Select(line => decimal.Parse(line.Split(',')[_gpsSpeedIndex]) * _options.GPSSpeedFactor).ToArray();
             CultureInfo.CurrentCulture = currentCulture;
             var minSpeed = speeds.Min();
             var maxSpeed = _maxSpeed = speeds.Max();
@@ -127,7 +127,7 @@ namespace OpenTXLog2GoogleEarthConvert
                 );
 
                 // Write legend
-                sw.WriteLine($"<Folder id=\"Legend\"><name>Legend: Speed (km/h)</name><visibility>1</visibility><open>1</open>");
+                sw.WriteLine($"<Folder id=\"Legend\"><name>Legend: Speed ({_options.GPSSpeedLabel})</name><visibility>1</visibility><open>1</open>");
                 foreach (var legend in _speedLegend)
                 {
                     sw.WriteLine($"<Placemark>");
@@ -146,36 +146,36 @@ namespace OpenTXLog2GoogleEarthConvert
 
                     if (last_lat == null || last_lon == null || last_alt == null)
                     {
-                        last_lat = data.lat;
-                        last_lon = data.lon;
-                        last_alt = data.alt;
+                        last_lat = data.Lat;
+                        last_lon = data.Lon;
+                        last_alt = data.Alt;
                         continue;
                     }
 
-                    var color = _speedColors[(int)data.kmh];
+                    var color = _speedColors[(int)data.Speed];
                     sw.WriteLine($"<Placemark>");
-                    sw.WriteLine($"<name><![CDATA[<span style=\"color:{color.WebColor}\">{data.kmh:0.00} kmh</span>]]></name>");
-                    sw.WriteLine($"<styleUrl>#colorSpeedTrack{(int)data.kmh}</styleUrl>");
+                    sw.WriteLine($"<name><![CDATA[<span style=\"color:{color.WebColor}\">{data.Speed:0.00} {_options.GPSSpeedLabel}</span>]]></name>");
+                    sw.WriteLine($"<styleUrl>#colorSpeedTrack{(int)data.Speed}</styleUrl>");
                     sw.WriteLine($"<LineString>");
                     sw.WriteLine($"<tessellate>1</tessellate>");
                     sw.WriteLine($"<altitudeMode>{_options.AltitudeMode}</altitudeMode>");
-                    sw.WriteLine($"<coordinates>{last_lon:0.00000000},{last_lat:0.00000000},{last_alt:0.00} {data.lon:0.00000000},{data.lat:0.00000000},{data.alt:0.00}</coordinates>");
+                    sw.WriteLine($"<coordinates>{last_lon:0.00000000},{last_lat:0.00000000},{last_alt:0.00} {data.Lon:0.00000000},{data.Lat:0.00000000},{data.Alt:0.00}</coordinates>");
                     sw.WriteLine($"</LineString>");
                     sw.WriteLine($"</Placemark>");
 
-                    last_lat = data.lat;
-                    last_lon = data.lon;
-                    last_alt = data.alt;
+                    last_lat = data.Lat;
+                    last_lon = data.Lon;
+                    last_alt = data.Alt;
                 }
                 sw.WriteLine(@"</Folder>");
 
                 // write playback track (google earth extension)
-                sw.WriteLine($"<Folder><name>Flight max. {_maxSpeed:0.00}kmh</name><visibility>1</visibility><open>0</open>");
+                sw.WriteLine($"<Folder><name>Flight max. {_maxSpeed:0.00}{_options.GPSSpeedLabel}</name><visibility>1</visibility><open>0</open>");
                 sw.WriteLine($"<Placemark><name>{_options.Name}</name><styleUrl>#multiTrack</styleUrl><gx:Track><altitudeMode>{_options.AltitudeMode}</altitudeMode>");
                 foreach (var data in StreamLogData())
                 {
-                    sw.WriteLine($"<when>{data.timeStamp:yyyy-MM-ddTHH:mm:ss.FFFZ}</when>");
-                    sw.WriteLine($"<gx:coord>{data.lon:0.00000000},{data.lat:0.00000000},{data.alt:0.00}</gx:coord>");
+                    sw.WriteLine($"<when>{data.TimeStamp:yyyy-MM-ddTHH:mm:ss.FFFZ}</when>");
+                    sw.WriteLine($"<gx:coord>{data.Lon:0.00000000},{data.Lat:0.00000000},{data.Alt:0.00}</gx:coord>");
                 }
                 sw.WriteLine(@"</gx:Track></Placemark></Folder>");
 
@@ -188,11 +188,11 @@ namespace OpenTXLog2GoogleEarthConvert
 
         private class LogData
         {
-            public float alt { get; set; }
-            public decimal lat { get; set; }
-            public decimal lon { get; set; }
-            public decimal kmh { get; set; }
-            public DateTime timeStamp { get; set; }
+            public float Alt { get; set; }
+            public decimal Lat { get; set; }
+            public decimal Lon { get; set; }
+            public decimal Speed { get; set; }
+            public DateTime TimeStamp { get; set; }
         }
 
         private IEnumerable<LogData> StreamLogData()
@@ -213,12 +213,12 @@ namespace OpenTXLog2GoogleEarthConvert
                         .AddTicks(DateTime.Parse(data[_timeIndex]).Ticks);
 
                 float alt = float.Parse(data[_altitudeIndex]) + _options.AltitudeOffset;
-                decimal kmh = decimal.Parse(data[_gpsSpeedIndex]);
+                decimal spd = decimal.Parse(data[_gpsSpeedIndex]) * _options.GPSSpeedFactor;
                 var gps = data[_gpsIndex].Split(' ');
                 decimal lat = decimal.Parse(gps[0]);
                 decimal lon = decimal.Parse(gps[1]);
 
-                yield return new LogData() { alt = alt, kmh = kmh, lat = lat, lon = lon, timeStamp = timeStamp };
+                yield return new LogData() { Alt = alt, Speed = spd, Lat = lat, Lon = lon, TimeStamp = timeStamp };
             }
         }
     }
