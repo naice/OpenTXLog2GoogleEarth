@@ -4,9 +4,10 @@ Converts OpenTX log files (with gps data) to GoogleEarth (kml file)
 
 ![Preview](https://github.com/naice/OpenTXLog2GoogleEarth/blob/master/Media/Google%20Earth%20Pro.png)
 
-# Usage
+# Google Earth
 Install Google Earth Pro from here: https://www.google.de/earth/download/gep/agree.html
 
+# Usage
 You need to configure the application first in order to use it correctly. Configuration is done via config.json
 
 ```JSON
