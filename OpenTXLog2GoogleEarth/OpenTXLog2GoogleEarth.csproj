@@ -4,7 +4,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <ApplicationIcon>iconfinder_gps-fixed_326550.ico</ApplicationIcon>
-    <Version>0.0.2</Version>
+    <Version>0.0.4</Version>
   </PropertyGroup>
 
   <ItemGroup>
