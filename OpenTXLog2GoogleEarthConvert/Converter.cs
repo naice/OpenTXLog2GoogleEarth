@@ -37,81 +37,28 @@ namespace OpenTXLog2GoogleEarthConvert
             CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
 
             var speedData = _speedData.Value;
-
+            string snippet = @"<![CDATA[Created using <a href=""https://github.com/naice/OpenTXLog2GoogleEarth"">OpenTXLog2GoogleEarth</a>]]>";
             using (StreamWriter sw = new StreamWriter(_options.OutputStream))
             {
-                StringBuilder colorSection = new StringBuilder();
-                if (speedData.SpeedColors != null && speedData.SpeedColors.Count > 0)
+                sw.WriteLine(Constants.KML_HEADER);
+                using (DocumentWriter dw = new DocumentWriter(sw, _options.FullName, snippet))
                 {
-                    foreach (var speedColor in speedData.SpeedColors)
-                    {
-                        colorSection.AppendLine(Constants.KML_COLORSECTION
-                            .Replace("{SPEED}", speedColor.Key.ToString())
-                            .Replace("{COLOR}", speedColor.Value.ABGRString));
-                    }
+                    dw.Open();
+                    ColorTrackStyleWriter colorTrackStyleWriter = new ColorTrackStyleWriter(sw, _options, speedData);
+                    colorTrackStyleWriter.Write();
+
+                    // Write legend
+                    ColorTrackLegendWriter colorTrackLegendWriter = new ColorTrackLegendWriter(sw, _options, speedData);
+                    colorTrackLegendWriter.Write();
+
+                    // write speedlayer
+                    ColorTrackWriter colorTrackWriter = new ColorTrackWriter(sw, _options, speedData.SpeedColors, _logData.Value);
+                    colorTrackWriter.Write();
+
+                    // write playback track (google earth extension)
+                    FlightWriter flightWriter = new FlightWriter(sw, _options, _logData.Value);
+                    flightWriter.Write();
                 }
-
-                // Write header
-                sw.WriteLine(Constants.KML_HEADER
-                    .Replace("{COLORSECTION}", colorSection.ToString())
-                    .Replace("{NAME}", _options.Name)
-                    .Replace("{FULLNAME}", _options.FullName)
-                    .Replace("{ALT_MODE}", _options.AltitudeMode)
-                    .Replace("{COLOR}", _options.PathColor)
-                );
-
-                // Write legend
-                sw.WriteLine($"<Folder id=\"Legend\"><name>Legend: Speed ({_options.GPSSpeedLabel})</name><visibility>1</visibility><open>1</open>");
-                foreach (var legend in speedData.SpeedLegend)
-                {
-                    sw.WriteLine($"<Placemark>");
-                    sw.WriteLine($"<name><![CDATA[<span style=\"color:{legend.FromColor.WebColor};\"><b>{legend.FromSpeed:0.00}</b></span> - <span style=\"color:{legend.ToColor.WebColor};\"><b>{legend.ToSpeed:0.00}</b></span>]]></name>");
-                    sw.WriteLine($"<visibility>1</visibility><styleUrl>#speed_legend</styleUrl></Placemark>");
-                }
-                sw.WriteLine($"</Folder>");
-
-                // write speedlayer
-                double? last_lat = null;
-                double? last_lon = null;
-                float? last_alt = null;
-                sw.WriteLine(@"<Folder><name>SpeedLayer</name><visibility>1</visibility><open>0</open>");
-                foreach (var data in _logData.Value)
-                {
-                    if (last_lat == null || last_lon == null || last_alt == null)
-                    {
-                        last_lat = data.Latitude;
-                        last_lon = data.Longitude;
-                        last_alt = data.Alt;
-                        continue;
-                    }
-
-                    var color = speedData.SpeedColors[(int)data.Speed];
-                    sw.WriteLine($"<Placemark>");
-                    sw.WriteLine($"<name><![CDATA[<span style=\"color:{color.WebColor}\">{data.Speed:0.00} {_options.GPSSpeedLabel}</span>]]></name>");
-                    sw.WriteLine($"<styleUrl>#colorSpeedTrack{(int)data.Speed}</styleUrl>");
-                    sw.WriteLine($"<LineString>");
-                    sw.WriteLine($"<tessellate>1</tessellate>");
-                    sw.WriteLine($"<altitudeMode>{_options.AltitudeMode}</altitudeMode>");
-                    sw.WriteLine($"<coordinates>{last_lon:0.00000000},{last_lat:0.00000000},{last_alt:0.00} {data.Longitude:0.00000000},{data.Latitude:0.00000000},{data.Alt:0.00}</coordinates>");
-                    sw.WriteLine($"</LineString>");
-                    sw.WriteLine($"</Placemark>");
-
-                    last_lat = data.Latitude;
-                    last_lon = data.Longitude;
-                    last_alt = data.Alt;
-                }
-                sw.WriteLine(@"</Folder>");
-
-                // write playback track (google earth extension)
-                sw.WriteLine($"<Folder><name>Flight max. {speedData.MaxSpeed:0.00}{_options.GPSSpeedLabel}</name><visibility>1</visibility><open>0</open>");
-                sw.WriteLine($"<Placemark><name>{_options.Name}</name><styleUrl>#multiTrack</styleUrl><gx:Track><altitudeMode>{_options.AltitudeMode}</altitudeMode>");
-                foreach (var data in _logData.Value)
-                {
-                    sw.WriteLine($"<when>{data.TimeStamp:yyyy-MM-ddTHH:mm:ss.FFFZ}</when>");
-                    sw.WriteLine($"<gx:coord>{data.Longitude:0.00000000},{data.Latitude:0.00000000},{data.Alt:0.00}</gx:coord>");
-                }
-                sw.WriteLine(@"</gx:Track></Placemark></Folder>");
-
                 // write footer
                 sw.WriteLine(Constants.KML_FOOTER);
             }
