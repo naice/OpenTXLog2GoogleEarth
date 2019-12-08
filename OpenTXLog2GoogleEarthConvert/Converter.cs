@@ -15,7 +15,7 @@ namespace OpenTXLog2GoogleEarthConvert
         public List<LegendData> SpeedLegend { get; set; } = new List<LegendData>();
     }
 
-    public partial class Converter
+    public class Converter
     {
         private readonly ConverterOptions _options;
         private readonly Lazy<LogData[]> _logData;
@@ -27,7 +27,7 @@ namespace OpenTXLog2GoogleEarthConvert
             _options = options ?? throw new ArgumentNullException(nameof(options));
             _logData = new Lazy<LogData[]>(() => ParseLogData().ToArray());
             _logHeader = new Lazy<LogHeader>(() => ParseLogHeader());
-            _speedData = new Lazy<SpeedData>(() => ParseSpeedData());
+            _speedData = new Lazy<SpeedData>(() => ParseSpeedData(_logData.Value));
         }
 
         public void Convert()
@@ -36,34 +36,63 @@ namespace OpenTXLog2GoogleEarthConvert
             var currentCulture = CultureInfo.CurrentCulture;
             CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
 
-            var speedData = _speedData.Value;
             string snippet = @"<![CDATA[Created using <a href=""https://github.com/naice/OpenTXLog2GoogleEarth"">OpenTXLog2GoogleEarth</a>]]>";
             using (StreamWriter sw = new StreamWriter(_options.OutputStream))
             {
                 sw.WriteLine(Constants.KML_HEADER);
+
                 using (DocumentWriter dw = new DocumentWriter(sw, _options.FullName, snippet))
                 {
                     dw.Open();
-                    ColorTrackStyleWriter colorTrackStyleWriter = new ColorTrackStyleWriter(sw, _options, speedData);
-                    colorTrackStyleWriter.Write();
+                    bool open = true, visible = true;
+                    int flightCount = 1;
 
-                    // Write legend
-                    ColorTrackLegendWriter colorTrackLegendWriter = new ColorTrackLegendWriter(sw, _options, speedData);
-                    colorTrackLegendWriter.Write();
+                    foreach (var logData in ParseMultiFlightLog(_logData.Value))
+                    {
+                        var speedData = ParseSpeedData(logData);
+                        using (var folder = new FolderWriter(sw, $"Flight {flightCount}", visible, open))
+                        {
+                            folder.Open();
+                            ColorTrackStyleWriter colorTrackStyleWriter = new ColorTrackStyleWriter(sw, _options, speedData);
+                            colorTrackStyleWriter.Write();
 
-                    // write speedlayer
-                    ColorTrackWriter colorTrackWriter = new ColorTrackWriter(sw, _options, speedData.SpeedColors, _logData.Value);
-                    colorTrackWriter.Write();
+                            // Write legend
+                            ColorTrackLegendWriter colorTrackLegendWriter = new ColorTrackLegendWriter(sw, _options, speedData);
+                            colorTrackLegendWriter.Write();
 
-                    // write playback track (google earth extension)
-                    FlightWriter flightWriter = new FlightWriter(sw, _options, _logData.Value);
-                    flightWriter.Write();
+                            // write speedlayer
+                            ColorTrackWriter colorTrackWriter = new ColorTrackWriter(sw, _options, speedData.SpeedColors, logData);
+                            colorTrackWriter.Write();
+
+                            // write playback track (google earth extension)
+                            FlightWriter flightWriter = new FlightWriter(sw, _options, logData);
+                            flightWriter.Write();
+                        }
+
+                        flightCount++;
+                    }
                 }
                 // write footer
                 sw.WriteLine(Constants.KML_FOOTER);
             }
 
             CultureInfo.CurrentCulture = currentCulture;
+        }
+
+        private IEnumerable<LogData[]> ParseMultiFlightLog(IEnumerable<LogData> logDataRaw)
+        {
+            List<LogData> logSet = new List<LogData>();
+            var last = (LogData)null;
+            foreach (var log in logDataRaw)
+            {
+                if (last != null && (log.TimeStamp - last.TimeStamp).TotalMinutes > 1)
+                {
+                    yield return logSet.ToArray();
+                    logSet.Clear();
+                }
+                logSet.Add(log);
+                last = log;
+            }
         }
 
         private LogHeader ParseLogHeader()
@@ -133,7 +162,7 @@ namespace OpenTXLog2GoogleEarthConvert
             }
         }
 
-        private SpeedData ParseSpeedData()
+        private SpeedData ParseSpeedData(IEnumerable<LogData> logData)
         {
             SpeedData speedData = new SpeedData();
             var makeSpeedHue = new Func<double, double, double>((spd, maxSpd) => {
@@ -142,7 +171,7 @@ namespace OpenTXLog2GoogleEarthConvert
                     speedPercent = ((spd / maxSpd) * -0.34d) + 0.34d;
                 return speedPercent;
             });
-            var speeds = _logData.Value.Select(d => d.Speed);
+            var speeds = logData.Select(d => d.Speed);
             var currentCulture = CultureInfo.CurrentCulture;
             CultureInfo.CurrentCulture = CultureInfo.InvariantCulture;
             CultureInfo.CurrentCulture = currentCulture;
