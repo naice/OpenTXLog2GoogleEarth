@@ -17,8 +17,11 @@ namespace OpenTXLog2GoogleEarthConvert
 
         public ColorHLS(int a, double h, double l, double s)
         {
-            A = a; H = h; L = l; S = s;
+            A = a; H = KeepInRange(h); L = KeepInRange(l); S = KeepInRange(s);
         }
+
+        private static double KeepInRange(double a)
+            => a < 0 ? 0 : a > 1 ? 1 : a;
 
         public string ARGBString
             => this.HlsToRgb().ARGBString;

@@ -63,7 +63,7 @@ namespace OpenTXLog2GoogleEarthConvert
         /// NODE (KNOTEN) = 1.852
         /// MPH = 1.609344
         /// </summary>
-        public decimal GPSSpeedFactor { get; set; } = 1m;
+        public double GPSSpeedFactor { get; set; } = 1d;
         /// <summary>
         /// Label for speed output.
         /// </summary>

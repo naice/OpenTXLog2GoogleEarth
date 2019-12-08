@@ -2,7 +2,7 @@
   "profiles": {
     "OpenTXLog2GoogleEarth": {
       "commandName": "Project",
-      "commandLineArgs": "\"C:\\S800-2019-12-04.csv\""
+      "commandLineArgs": "\"D:\\LOGS\\S800-2019-12-07.csv\""
     }
   }
 }
