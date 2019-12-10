@@ -93,6 +93,9 @@ namespace OpenTXLog2GoogleEarthConvert
                 logSet.Add(log);
                 last = log;
             }
+
+            if (logSet.Count > 0)
+                yield return logSet.ToArray();
         }
 
         private LogHeader ParseLogHeader()
